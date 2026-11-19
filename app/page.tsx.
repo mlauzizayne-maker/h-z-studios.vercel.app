@@ -41,7 +41,7 @@ const initialPublications: Publication[] = [
     type: "Anime",
     category: "Historical / Action",
     status: "Published",
-    date: "2025"
+    date: "2026"
   },
   {
     id: 3,
@@ -49,15 +49,36 @@ const initialPublications: Publication[] = [
     type: "Manga",
     category: "Mystery",
     status: "Published",
-    date: "2024"
-  }
-  { 
-    id: 4,
-    title: "Ruic Chronicles",
-    type: "novel",
-    category: "fantasy",
-    status: "published",
     date: "2026"
+  },
+  
+{
+  id: 4,
+  title: "Ruic Chronicles",
+  type: "Anime",
+  category: "Fantasy",
+  status: "Published",
+  date: "2026"
+},
+{
+  id: 5,
+  title: "Ruic Chronicles",
+  type: "Manga",
+  category: "Fantasy",
+  status: "Published",
+  date: "2026"
+},
+{
+  id: 6,
+  title: "Ruic Chronicles",
+  type: "Novel",
+  category: "Fantasy",
+  status: "Published",
+  date: "2026"
+}
+
+  
+
 ];
 
 export default function Dashboard() {
