@@ -51,6 +51,13 @@ const initialPublications: Publication[] = [
     status: "Published",
     date: "2024"
   }
+  { 
+    id: 4,
+    title: "Ruic Chronicles",
+    type: "novel",
+    category: "fantasy",
+    status: "published",
+    date: "2026"
 ];
 
 export default function Dashboard() {
