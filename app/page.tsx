@@ -51,7 +51,32 @@ const initialPublications: Publication[] = [
     status: "Published",
     date: "2024"
   }
-];
+
+{
+  id: 4,
+  title: "Ruic Chronicles",
+  type: "Anime",
+  category: "Fantasy",
+  status: "Published",
+  date: "2026"
+},
+{
+  id: 5,
+  title: "Ruic Chronicles",
+  type: "Manga",
+  category: "Fantasy",
+  status: "Published",
+  date: "2026"
+},
+{
+  id: 6,
+  title: "Ruic Chronicles",
+  type: "Novel",
+  category: "Fantasy",
+  status: "Published",
+  date: "2026"
+}
+
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("Overview");
