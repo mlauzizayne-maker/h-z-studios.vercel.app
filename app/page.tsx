@@ -1,3 +1,163 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+type Division = "Anime" | "Manga" | "Novel" | "Music" | "Broadcasting" | "News";
+type Publication = {
+  id: number;
+  title: string;
+  type: Division[];
+  category: string;
+  status: string;
+  date: string;
+  };
+
+const divisions: Division[] = ["Anime", "Manga", "Novel", "Music", "Broadcasting", "News"];
+const navigation = [
+  "Overview", "Anime Management", "Manga Management", "Novel Publishing",
+  "Music Management", "Broadcasting", "Website Pages", "Media Library",
+  "Administrators", "Analytics", "Settings",
+];
+
+const starterPublications: Publication[] = [
+  { id: 1, title: "Iron Requiem", type: ["Anime"], category: "Mecha / Sci-Fi", status: "In Progress", date: "2026" },
+  { id: 2, title: "Crimson Petal", type: ["Anime"], category: "Historical / Action", status: "Published", date: "2025" },
+  { id: 3, title: "Static Rain", type: ["Manga"], category: "Mystery / Slice of Life", status: "Published", date: "2024" },
+  { id: 4, title: "Ruic Chronicles", type: ["Anime", "Manga", "Novel"], category: "Fantasy", status: "Published", date: "2026" },
+];
+
+function normalisePublication(item: any): Publication {
+  return {
+    ...item,
+    type: Array.isArray(item.type) ? item.type : [item.type || "Anime"],
+  };
+}
+
+export default function Dashboard() {
+  const [activePage, setActivePage] = useState("Overview");
+  const [publications, setPublications] = useState<Publication[]>(starterPublications);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [title, setTitle] = useState("");
+  const [types, setTypes] = useState<Division[]>(["Anime"]);
+  const [category, setCategory] = useState("");
+  const [status, setStatus] = useState("Draft");
+
+  // Load saved publications once when the page opens.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("hz-publications");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setPublications(parsed.map(normalisePublication));
+      }
+    } catch (error) {
+      console.error("Could not load H&Z publications", error);
+    }
+    setHasLoaded(true);
+  }, []);
+
+  // Save every change in this browser.
+  useEffect(() => {
+    if (hasLoaded) {
+      localStorage.setItem("hz-publications", JSON.stringify(publications));
+    }
+  }, [publications, hasLoaded]);
+
+  function resetForm() {
+    setTitle("");
+    setTypes(["Anime"]);
+    setCategory("");
+    setStatus("Draft");
+    setEditingId(null);
+    setShowForm(false);
+  }
+
+  function toggleDivision(division: Division) {
+    setTypes((current) =>
+      current.includes(division)
+        ? current.filter((item) => item !== division)
+        : [...current, division]
+    );
+  }
+
+  function savePublication() {
+    if (!title.trim() || !category.trim() || types.length === 0) {
+      alert("Please enter a title, choose at least one division, and enter a category.");
+      return;
+    }
+
+    if (editingId !== null) {
+      setPublications((current) => current.map((item) =>
+        item.id === editingId
+          ? { ...item, title: title.trim(), type: types, category: category.trim(), status }
+          : item
+      ));
+    } else {
+      const newPublication: Publication = {
+        id: Date.now(), title: title.trim(), type: types,
+        category: category.trim(), status,
+        date: new Date().getFullYear().toString(),
+      };
+      setPublications((current) => [newPublication, ...current]);
+    }
+    resetForm();
+  }
+
+  function startEditing(item: Publication) {
+    setEditingId(item.id);
+    setTitle(item.title);
+    setTypes(item.type);
+    setCategory(item.category);
+    setStatus(item.status);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function deletePublication(id: number) {
+    if (confirm("Delete this publication?")) {
+      setPublications((current) => current.filter((item) => item.id !== id));
+    }
+  }
+
+  const published = publications.filter((item) => item.status === "Published").length;
+  const drafts = publications.filter((item) => item.status === "Draft").length;
+
+  const filteredPublications = useMemo(() => {
+    if (activePage === "Overview") return publications;
+    const pageType = activePage.replace(" Management", "").replace(" Publishing", "").replace(/s$/, "");
+    return publications.filter((item) => item.type.some((division) => division.toLowerCase() === pageType.toLowerCase()));
+  }, [activePage, publications]);
+
+  return (
+    <main className="min-h-screen bg-[#080808] text-white flex">
+      <aside className="w-64 min-h-screen bg-[#111111] border-r border-[#302419] p-5 hidden md:flex flex-col">
+        <div className="mb-10">
+          <h1 className="text-2xl font-black tracking-wider">H<span className="text-[#D4AF37]">&</span>Z</h1>
+          <p className="text-[#D4AF37] text-xs tracking-[3px]">STUDIOS</p>
+          <p className="text-gray-500 text-xs mt-2">ADMIN CONTROL CENTRE</p>
+        </div>
+        <p className="text-gray-500 text-xs mb-3">MAIN MENU</p>
+        <nav className="flex flex-col gap-2">
+          {navigation.map((item) => (
+            <button key={item} onClick={() => setActivePage(item)} className={`text-left px-3 py-3 rounded-lg text-sm transition ${activePage === item ? "bg-[#B00020] text-white border-l-4 border-[#D4AF37]" : "text-gray-400 hover:bg-[#252525] hover:text-white"}`}>
+              {item}
+            </button>
+          ))}
+        </nav>
+        <div className="mt-auto border-t border-gray-800 pt-5">
+          <p className="text-[#D4AF37] text-xs">H&Z STUDIOS</p>
+          <p className="text-gray-500 text-xs mt-1">Management System</p>
+        </div>
+      </aside>
+
+      <section className="flex-1 min-w-0">
+        <header className="h-20 bg-[#111111] border-b border-[#302419] px-5 md:px-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold">{activePage}</h2>
+            <p className="text-gray-500 text-xs">H&Z Studios Management Portal</p>
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-[#D4AF37] text-xs hidden sm:block">ADMINISTRATOR</span>
             <div className="w-10 h-10 rounded-full bg-[#B00020] border border-[#D4AF37] flex items-center justify-center font-bold">HZ</div>
@@ -6,8 +166,8 @@
 
         <div className="p-5 md:p-8">
           <div className="mb-8">
-            <p className="text-[#D4AF37] text-sm tracking-widest">WELCOME TO THE STUDIO</p>
-            <h1 className="text-3xl md:text-4xl font-black mt-2">H&Z Studios <span className="text-[#D4AF37]">Dashboard</span></h1>
+            <p className="text-[#D4AF37] text-sm 
+                        t            tt  <h1 className="text-3xl md:text-4xl font-black mt-2">H&Z Studios <span className="text-[#D4AF37]">Dashboard</span></h1>
             <p className="text-gray-400 mt-2">Manage, create and publish your entertainment projects.</p>
           </div>
 
