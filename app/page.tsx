@@ -81,6 +81,17 @@ const initialPublications: Publication[] = [
 
 
 export default function Dashboard() {
+useEffect(() => {
+  async function checkLogin() {
+    const { data } = await supabase.auth.getSession();
+
+    if (!data.session) {
+      window.location.href = "/login";
+    }
+  }
+
+  checkLogin();
+}, []);
   const [activePage, setActivePage] = useState("Overview");
   const [publications, setPublications] =
     useState<Publication[]>(initialPublications);
