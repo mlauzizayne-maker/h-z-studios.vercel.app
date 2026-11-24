@@ -91,28 +91,45 @@ export default function Dashboard() {
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("Draft");
 
-  function addPublication() {
-    if (!title.trim() || !category.trim()) {
-      alert("Please enter a title and category.");
-      return;
-    }
+ async function addPublication() {
+  if (!title.trim() || !category.trim()) {
+    alert("Please enter a title and category.");
+    return;
+  }
 
-    const newPublication: Publication = {
-      id: Date.now(),
+  const { data, error } = await supabase
+    .from("publications")
+    .insert({
       title,
       type,
       category,
       status,
-      date: new Date().getFullYear().toString()
-    };
+      release_year: Number(new Date().getFullYear()),
+    })
+    .select()
+    .single();
 
-    setPublications([newPublication, ...publications]);
-
-    setTitle("");
-    setCategory("");
-    setStatus("Draft");
-    setShowForm(false);
+  if (error) {
+    alert("Could not save publication: " + error.message);
+    return;
   }
+
+  const newPublication: Publication = {
+    id: Number(data.id),
+    title: data.title,
+    type: data.type,
+    category: data.category,
+    status: data.status,
+    date: String(data.release_year),
+  };
+
+  setPublications([newPublication, ...publications]);
+
+  setTitle("");
+  setCategory("");
+  setStatus("Draft");
+  setShowForm(false);
+} 
 
   function deletePublication(id: number) {
     if (confirm("Delete this publication?")) {
