@@ -79,7 +79,13 @@ console.log("Login result:", { data, error });
             Sign in to access the H&amp;Z control centre.
           </p>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form
+  onSubmit={(e) => {
+    console.log("LOGIN BUTTON WORKS");
+    handleLogin(e);
+  }}
+  className="space-y-5"
+>
             <div>
               <label className="text-sm text-gray-300">
                 Email Address
