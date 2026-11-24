@@ -18,10 +18,12 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({
+  email: email.trim(),
+  password,
+});
+
+console.log("Login result:", { data, error });
 
     if (error) {
       setError(error.message);
