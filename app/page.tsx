@@ -1,7 +1,7 @@
 
 "use client";
 import { supabase } from "@/lib/supabase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Publication = {
   id: number;
